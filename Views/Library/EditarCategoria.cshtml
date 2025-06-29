@@ -1,0 +1,158 @@
+@model VisualizadorEstructuras.Models.Categoria
+@{
+    ViewData["Title"] = "Editar Categoría";
+    var categoriasPadre = ViewBag.CategoriasPadre as List<VisualizadorEstructuras.Models.Categoria> ?? new List<VisualizadorEstructuras.Models.Categoria>();
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="@Url.Action("Categorias", "Library")" class="btn btn-secondary">Volver a Categorías</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4><i class="fas fa-edit"></i> Editar Categoría</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditarCategoria" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nombre" class="form-label">Nombre</label>
+                                    <input asp-for="Nombre" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CategoriaPadreId" class="form-label">Categoría Padre</label>
+                                    <select asp-for="CategoriaPadreId" class="form-select">
+                                        <option value="">Sin categoría padre (Categoría raíz)</option>
+                                        @foreach (var categoria in categoriasPadre)
+                                        {
+                                            @if (Model.CategoriaPadreId == categoria.Id)
+                                            {
+                                                <option value="@categoria.Id" selected>@categoria.Nombre</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@categoria.Id">@categoria.Nombre</option>
+                                            }
+                                            @if (categoria.Subcategorias != null)
+                                            {
+                                                foreach (var sub in categoria.Subcategorias)
+                                                {
+                                                    @if (Model.CategoriaPadreId == sub.Id)
+                                                    {
+                                                        <option value="@sub.Id" selected>── @sub.Nombre</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@sub.Id">── @sub.Nombre</option>
+                                                    }
+                                                    @if (sub.Subcategorias != null)
+                                                    {
+                                                        foreach (var subsub in sub.Subcategorias)
+                                                        {
+                                                            @if (Model.CategoriaPadreId == subsub.Id)
+                                                            {
+                                                                <option value="@subsub.Id" selected>──── @subsub.Nombre</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@subsub.Id">──── @subsub.Nombre</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        Selecciona una categoría padre para convertir esta en subcategoría, o déjala vacía para convertirla en categoría raíz.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="Descripcion" class="form-label">Descripción</label>
+                                    <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save"></i> Actualizar Categoría
+                                </button>
+                                <a href="@Url.Action("Categorias", "Library")" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información sobre la categoría actual -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-info-circle"></i> Información de la Categoría</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Estado actual:</strong></p>
+                            @if (Model.CategoriaPadre != null)
+                            {
+                                <p>Esta es una <strong>subcategoría</strong> de <strong>@Model.CategoriaPadre.Nombre</strong></p>
+                            }
+                            else
+                            {
+                                <p>Esta es una <strong>categoría raíz</strong></p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Estructura jerárquica:</strong></p>
+                            <p>Las categorías pueden organizarse en una estructura de árbol donde:</p>
+                            <ul>
+                                <li><strong>Categorías raíz</strong> no tienen padre</li>
+                                <li><strong>Subcategorías</strong> pertenecen a una categoría padre</li>
+                                <li>Puedes cambiar la jerarquía editando la categoría padre</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal explicativo del árbol -->
+<div class="modal fade" id="modalInfoArbol" tabindex="-1" aria-labelledby="modalInfoArbolLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalInfoArbolLabel"><i class="fas fa-info-circle"></i> ¿Por qué un Árbol?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616494.png" alt="Árbol" style="width:60px;" class="mb-2 d-block mx-auto" />
+                <p>Las categorías se gestionan como un <b>árbol</b>, donde cada nodo puede tener hijos (subcategorías). Esto permite una organización jerárquica y eficiente para navegar y agrupar libros.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div> 

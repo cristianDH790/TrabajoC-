@@ -1,0 +1,1 @@
+// Este archivo se dejará solo para la lógica de explicación teórica de estructuras si se requiere en la sección de teoría. 

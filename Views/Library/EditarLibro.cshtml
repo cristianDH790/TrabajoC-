@@ -1,0 +1,142 @@
+@model VisualizadorEstructuras.Models.Libro
+@{
+    ViewData["Title"] = "Editar Libro";
+    var categorias = ViewBag.Categorias as List<VisualizadorEstructuras.Models.Categoria> ?? new List<VisualizadorEstructuras.Models.Categoria>();
+}
+
+<div class="container-fluid">
+    <!-- Header del Formulario -->
+    <div class="form-header text-center">
+        <h1><i class="fas fa-edit"></i> Editar Libro</h1>
+        <p class="lead mb-0">
+            Modificar nodo en la <strong>Lista Enlazada</strong> de libros
+        </p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card form-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-book"></i> Información del Libro</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditarLibro" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Titulo" class="form-label">Título <span class="text-danger">*</span></label>
+                                    <input asp-for="Titulo" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Autor" class="form-label">Autor <span class="text-danger">*</span></label>
+                                    <input asp-for="Autor" class="form-control" required />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ISBN" class="form-label">ISBN</label>
+                                    <input asp-for="ISBN" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Anio" class="form-label">Año de Publicación</label>
+                                    <input asp-for="Anio" type="number" class="form-control" min="1000" max="@DateTime.Now.Year" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CategoriaId" class="form-label">Categoría <span class="text-danger">*</span></label>
+                                    <select asp-for="CategoriaId" class="form-select" required>
+                                        <option value="">Seleccionar categoría...</option>
+                                        @foreach (var categoria in categorias)
+                                        {
+                                            @if (Model.CategoriaId == categoria.Id)
+                                            {
+                                                <option value="@categoria.Id" selected>@categoria.Nombre</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@categoria.Id">@categoria.Nombre</option>
+                                            }
+                                            @if (categoria.Subcategorias != null)
+                                            {
+                                                foreach (var sub in categoria.Subcategorias)
+                                                {
+                                                    @if (Model.CategoriaId == sub.Id)
+                                                    {
+                                                        <option value="@sub.Id" selected>── @sub.Nombre</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@sub.Id">── @sub.Nombre</option>
+                                                    }
+                                                    @if (sub.Subcategorias != null)
+                                                    {
+                                                        foreach (var subsub in sub.Subcategorias)
+                                                        {
+                                                            @if (Model.CategoriaId == subsub.Id)
+                                                            {
+                                                                <option value="@subsub.Id" selected>──── @subsub.Nombre</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@subsub.Id">──── @subsub.Nombre</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Stock" class="form-label">Stock <span class="text-danger">*</span></label>
+                                    <input asp-for="Stock" type="number" class="form-control" min="0" required />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="Disponible" class="form-check-input" />
+                                        <label asp-for="Disponible" class="form-check-label">
+                                            Libro disponible
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="Descripcion" class="form-label">Descripción</label>
+                                    <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Catalogo", "Library")" class="btn btn-secondary btn-action">
+                                <i class="fas fa-arrow-left"></i> Volver al Catálogo
+                            </a>
+                            <button type="submit" class="btn btn-warning btn-action">
+                                <i class="fas fa-save"></i> Actualizar Libro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

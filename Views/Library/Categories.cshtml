@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "Gestión de Categorías";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var categorias = ViewBag.Categorias as List<VisualizadorEstructuras.Models.Categoria>;
+}
+
+<h2 class="d-inline-block">Categorías</h2>
+<a href="/Library/AgregarCategoria" class="btn btn-success float-end mb-2">
+    <i class="fas fa-plus"></i> Agregar Categoría
+</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Nivel</th>
+            <th>Padre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (categorias != null)
+        {
+            @foreach (var categoria in categorias.Where(c => c.CategoriaPadre == null))
+            {
+                <tr>
+                    <td>
+                        <i class="fas fa-folder"></i> @categoria.NombreCompleto
+                    </td>
+                    <td>
+                        Nivel @categoria.Nivel
+                    </td>
+                    <td>
+                        @(categoria.CategoriaPadre != null ? categoria.CategoriaPadre.Nombre : "Raíz")
+                    </td>
+                    <td>
+                        <a href="/Library/EditarCategoria/@categoria.Id" class="btn btn-sm btn-primary">Editar</a>
+                        <form method="post" action="/Library/EliminarCategoriaPost/@categoria.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta categoría?')">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                
+                @if (categoria.Subcategorias != null && categoria.Subcategorias.Count > 0)
+                {
+                    @foreach (var subcategoria in categoria.Subcategorias)
+                    {
+                        <tr>
+                            <td>
+                                <span style="margin-left:15px"></span>
+                                <i class="fas fa-folder"></i> @subcategoria.NombreCompleto
+                            </td>
+                            <td>
+                                Nivel @subcategoria.Nivel
+                            </td>
+                            <td>
+                                @(subcategoria.CategoriaPadre != null ? subcategoria.CategoriaPadre.Nombre : "Raíz")
+                            </td>
+                            <td>
+                                <a href="/Library/EditarCategoria/@subcategoria.Id" class="btn btn-sm btn-primary">Editar</a>
+                                <form method="post" action="/Library/EliminarCategoriaPost/@subcategoria.Id" style="display:inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta categoría?')">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        
+                        @if (subcategoria.Subcategorias != null && subcategoria.Subcategorias.Count > 0)
+                        {
+                            @foreach (var subsubcategoria in subcategoria.Subcategorias)
+                            {
+                                <tr>
+                                    <td>
+                                        <span style="margin-left:30px"></span>
+                                        <i class="fas fa-folder"></i> @subsubcategoria.NombreCompleto
+                                    </td>
+                                    <td>
+                                        Nivel @subsubcategoria.Nivel
+                                    </td>
+                                    <td>
+                                        @(subsubcategoria.CategoriaPadre != null ? subsubcategoria.CategoriaPadre.Nombre : "Raíz")
+                                    </td>
+                                    <td>
+                                        <a href="/Library/EditarCategoria/@subsubcategoria.Id" class="btn btn-sm btn-primary">Editar</a>
+                                        <form method="post" action="/Library/EliminarCategoriaPost/@subsubcategoria.Id" style="display:inline">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta categoría?')">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        // Animación de entrada para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+} 

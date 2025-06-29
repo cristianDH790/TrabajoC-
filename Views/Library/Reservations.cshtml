@@ -1,0 +1,276 @@
+@{
+    ViewData["Title"] = "Gestión de Reservas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var reservas = ViewBag.Reservas as List<VisualizadorEstructuras.Models.Reserva> ?? new List<VisualizadorEstructuras.Models.Reserva>();
+    var libros = ViewBag.Libros as List<VisualizadorEstructuras.Models.Libro> ?? new List<VisualizadorEstructuras.Models.Libro>();
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<div class="container-fluid">
+    <!-- Header de Reservas -->
+    <div class="reservations-header text-center">
+        <h1><i class="fas fa-clock"></i> Gestión de Reservas</h1>
+        <p class="lead mb-0">
+            Gestión mediante <strong>Cola (Queue)</strong> - FIFO (First In, First Out)
+            <button class="btn btn-light btn-sm ms-3 estructura-info" data-bs-toggle="modal" data-bs-target="#modalColaDetallada" title="¿Cómo funciona la cola en las reservas?">
+                <i class="fas fa-info-circle"></i> Explicación
+            </button>
+        </p>
+    </div>
+
+    <!-- Botón Agregar Reserva -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="@Url.Action("AgregarReserva", "Library")" class="btn btn-success btn-lg btn-action">
+                <i class="fas fa-plus"></i> Crear Nueva Reserva
+            </a>
+        </div>
+    </div>
+
+    <!-- Lista de Reservas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card tabla-crud tabla-reservas estructura-info">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Cola de Reservas (FIFO)</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Reservas != null && ((List<VisualizadorEstructuras.Models.Reserva>)ViewBag.Reservas).Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Usuario</th>
+                                        <th>Libro</th>
+                                        <th>Fecha Reserva</th>
+                                        <th>Estado</th>
+                                        <th>Prioridad</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int i = 1;
+                                    }
+                                    @foreach (var reserva in ViewBag.Reservas as List<VisualizadorEstructuras.Models.Reserva>)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>@reserva.NombreSolicitante</td>
+                                            <td>@reserva.Libro?.Titulo</td>
+                                            <td>@reserva.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                <span class="reservation-status status-@(reserva.Activa ? "activa" : "expirada")">
+                                                    @(reserva.Activa ? "Activa" : "Expirada")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">@i</span>
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("EditarReserva", "Library", new { id = reserva.Id })" class="btn btn-warning btn-sm me-1 btn-action">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </a>
+                                                <form method="post" action="@Url.Action("EliminarReservaPost", "Library", new { id = reserva.Id })" style="display:inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar esta reserva?')">
+                                                        <i class="fas fa-trash"></i> Eliminar
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <h3 class="text-muted">No hay reservas pendientes</h3>
+                            <p class="text-muted">La cola de reservas está vacía</p>
+                            <a href="@Url.Action("AgregarReserva", "Library")" class="btn btn-success btn-lg btn-action">
+                                <i class="fas fa-plus"></i> Crear Reserva
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cola Detallada -->
+<div class="modal fade" id="modalColaDetallada" tabindex="-1" aria-labelledby="modalColaDetalladaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalColaDetalladaLabel">
+                    <i class="fas fa-clock"></i> Cola (Queue) - Gestión de Reservas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es una Cola?</strong></h6>
+                        <p>Una cola es una estructura de datos FIFO (First In, First Out) donde el primer elemento agregado es el primero en salir.</p>
+                        
+                        <h6><strong>Características Principales:</strong></h6>
+                        <ul>
+                            <li><strong>FIFO:</strong> First In, First Out</li>
+                            <li><strong>Operaciones:</strong> Enqueue (agregar), Dequeue (quitar), Peek (ver)</li>
+                            <li><strong>Acceso limitado:</strong> Solo al frente y final</li>
+                            <li><strong>Orden justo:</strong> Primero en llegar, primero en ser atendido</li>
+                            <li><strong>Implementación:</strong> Array o Lista Enlazada</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro Sistema de Reservas:</strong></h6>
+                        <p>Las reservas funcionan como una cola donde:</p>
+                        <ul>
+                            <li><strong>Enqueue:</strong> Nueva reserva va al final de la cola</li>
+                            <li><strong>Dequeue:</strong> Primera reserva se procesa</li>
+                            <li><strong>Peek:</strong> Ver siguiente reserva sin procesarla</li>
+                            <li><strong>Prioridad:</strong> Orden cronológico de llegada</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas en el Sistema:</strong></h6>
+                        <ul>
+                            <li>Orden justo de atención</li>
+                            <li>Gestión de prioridades</li>
+                            <li>Control de espera</li>
+                            <li>Procesamiento secuencial</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Proceso de Operaciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Crear Reserva (Enqueue)</strong></h6>
+                                    <p class="small">1. Crear solicitud<br>2. Asignar timestamp<br>3. Agregar al final<br>4. Actualizar cola</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Procesar Reserva (Dequeue)</strong></h6>
+                                    <p class="small">1. Tomar del frente<br>2. Verificar disponibilidad<br>3. Procesar solicitud<br>4. Actualizar estado</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Ver Cola (Peek)</strong></h6>
+                                    <p class="small">1. Mostrar orden<br>2. Listar esperas<br>3. Calcular tiempos<br>4. Informar estado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Estados de las Reservas:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Pendiente</strong></h6>
+                                    <p class="small">Reserva en cola esperando ser procesada</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Procesada</strong></h6>
+                                    <p class="small">Reserva atendida y libro asignado</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Cancelada</strong></h6>
+                                    <p class="small">Reserva cancelada o expirada</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Complejidad Temporal:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Enqueue</strong></h6>
+                                    <p class="small">O(1) - Agregar al final</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Dequeue</strong></h6>
+                                    <p class="small">O(1) - Quitar del frente</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Peek</strong></h6>
+                                    <p class="small">O(1) - Ver sin quitar</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("AgregarReserva", "Library")" class="btn btn-info">
+                    <i class="fas fa-plus"></i> Crear Reserva
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Animación de entrada para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reservation-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+} 

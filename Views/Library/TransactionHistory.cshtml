@@ -1,0 +1,295 @@
+@{
+    ViewData["Title"] = "Historial de Transacciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model IEnumerable<VisualizadorEstructuras.Models.Prestamo>
+
+<div class="container-fluid">
+    <!-- Header de Transacciones -->
+    <div class="transactions-header text-center">
+        <h1><i class="fas fa-layer-group"></i> Historial de Transacciones</h1>
+        <p class="lead mb-0">
+            Gestión mediante <strong>Pila (Stack)</strong> - LIFO (Last In, First Out)
+            <button class="btn btn-dark btn-sm ms-3 estructura-info" data-bs-toggle="modal" data-bs-target="#modalPilaDetallada" title="¿Cómo funciona la pila en las transacciones?">
+                <i class="fas fa-info-circle"></i> Explicación
+            </button>
+        </p>
+    </div>
+
+    <!-- Botón Prestar Libro -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="@Url.Action("PrestarLibro", "Library")" class="btn btn-success btn-lg btn-action">
+                <i class="fas fa-plus"></i> Prestar Libro
+            </a>
+        </div>
+    </div>
+
+    <!-- Lista de Transacciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card tabla-crud tabla-transacciones estructura-info">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Pila de Transacciones (LIFO)</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Transacciones != null && ((List<VisualizadorEstructuras.Models.Prestamo>)ViewBag.Transacciones).Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tipo</th>
+                                        <th>Usuario</th>
+                                        <th>Libro</th>
+                                        <th>Fecha Transacción</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int i = 1;
+                                    }
+                                    @foreach (var transaccion in ViewBag.Transacciones as List<VisualizadorEstructuras.Models.Prestamo>)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>
+                                                <span class="transaction-type type-@transaccion.Tipo.ToString().ToLower()">
+                                                    @transaccion.Tipo
+                                                </span>
+                                            </td>
+                                            <td>@transaccion.NombreUsuario</td>
+                                            <td>@transaccion.Libro?.Titulo</td>
+                                            <td>@transaccion.FechaPrestamo.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                @if (transaccion.FechaDevolucion == null)
+                                                {
+                                                    <span class="badge bg-success">Activa</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Completada</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("EditarPrestamo", "Library", new { id = transaccion.Id })" class="btn btn-warning btn-sm me-1 btn-action">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </a>
+                                                <form method="post" action="@Url.Action("EliminarTransaccionPost", "Library", new { id = transaccion.Id })" style="display:inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar esta transacción?')">
+                                                        <i class="fas fa-trash"></i> Eliminar
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-layer-group fa-3x text-muted mb-3"></i>
+                            <h3 class="text-muted">No hay transacciones registradas</h3>
+                            <p class="text-muted">La pila de transacciones está vacía</p>
+                            <a href="@Url.Action("PrestarLibro", "Library")" class="btn btn-success btn-lg btn-action">
+                                <i class="fas fa-plus"></i> Prestar Libro
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pila Detallada -->
+<div class="modal fade" id="modalPilaDetallada" tabindex="-1" aria-labelledby="modalPilaDetalladaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalPilaDetalladaLabel">
+                    <i class="fas fa-layer-group"></i> Pila (Stack) - Historial de Transacciones
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es una Pila?</strong></h6>
+                        <p>Una pila es una estructura de datos LIFO (Last In, First Out) donde el último elemento agregado es el primero en salir.</p>
+                        
+                        <h6><strong>Características Principales:</strong></h6>
+                        <ul>
+                            <li><strong>LIFO:</strong> Last In, First Out</li>
+                            <li><strong>Operaciones:</strong> Push (agregar), Pop (quitar), Peek (ver)</li>
+                            <li><strong>Acceso limitado:</strong> Solo al elemento superior</li>
+                            <li><strong>Control de estados:</strong> Último en entrar, primero en salir</li>
+                            <li><strong>Implementación:</strong> Array o Lista Enlazada</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro Sistema de Transacciones:</strong></h6>
+                        <p>El historial de préstamos funciona como una pila donde:</p>
+                        <ul>
+                            <li><strong>Push:</strong> Nueva transacción se agrega al tope</li>
+                            <li><strong>Pop:</strong> Devolución quita la transacción más reciente</li>
+                            <li><strong>Peek:</strong> Ver la transacción actual</li>
+                            <li><strong>Historial:</strong> Orden cronológico inverso</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas en el Sistema:</strong></h6>
+                        <ul>
+                            <li>Control de transacciones recientes</li>
+                            <li>Deshacer operaciones fácilmente</li>
+                            <li>Historial ordenado cronológicamente</li>
+                            <li>Gestión de estados</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Proceso de Operaciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Prestar Libro (Push)</strong></h6>
+                                    <p class="small">1. Crear transacción<br>2. Verificar disponibilidad<br>3. Agregar al tope<br>4. Actualizar estado</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Devolver Libro (Pop)</strong></h6>
+                                    <p class="small">1. Tomar del tope<br>2. Marcar como devuelto<br>3. Actualizar libro<br>4. Registrar finalización</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Ver Historial (Peek)</strong></h6>
+                                    <p class="small">1. Recorrer pila<br>2. Mostrar transacciones<br>3. Ordenar por fecha<br>4. Filtrar estados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Tipos de Transacciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Préstamo</strong></h6>
+                                    <p class="small">Libro prestado a usuario<br>Estado: Activo<br>Acción: Push a la pila</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Devolución</strong></h6>
+                                    <p class="small">Libro devuelto por usuario<br>Estado: Completada<br>Acción: Pop de la pila</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Estados de las Transacciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Activa</strong></h6>
+                                    <p class="small">Libro prestado y no devuelto<br>En la pila de transacciones activas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-secondary text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Completada</strong></h6>
+                                    <p class="small">Libro devuelto<br>Transacción finalizada</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Complejidad Temporal:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Push</strong></h6>
+                                    <p class="small">O(1) - Agregar al tope</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Pop</strong></h6>
+                                    <p class="small">O(1) - Quitar del tope</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Peek</strong></h6>
+                                    <p class="small">O(1) - Ver sin quitar</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("PrestarLibro", "Library")" class="btn btn-warning">
+                    <i class="fas fa-plus"></i> Prestar Libro
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Animación de entrada para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.transaction-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+} 

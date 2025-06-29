@@ -1,0 +1,411 @@
+@{
+    ViewData["Title"] = "Catálogo de Libros";
+    var libros = ViewBag.Libros as List<VisualizadorEstructuras.Models.Libro> ?? new List<VisualizadorEstructuras.Models.Libro>();
+    var categorias = ViewBag.Categorias as List<VisualizadorEstructuras.Models.Categoria> ?? new List<VisualizadorEstructuras.Models.Categoria>();
+    string? buscarTitulo = Context.Request.Query["buscarTitulo"].ToString();
+    string? categoriaSeleccionada = Context.Request.Query["categoriaId"].ToString();
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<div class="container-fluid">
+    <div class="row align-items-center mb-3">
+        <div class="col-md-8">
+            <h2 class="d-flex align-items-center">
+                <i class="fas fa-books"></i> Catálogo de Libros
+                <button class="btn btn-info btn-sm ms-2 estructura-info" data-bs-toggle="modal" data-bs-target="#modalListaEnlazadaDetallada" title="¿Cómo funciona la lista enlazada?">
+                    <i class="fas fa-info-circle"></i> Explicación
+                </button>
+            </h2>
+            <p class="text-muted mb-0">Gestión mediante <strong>Lista Enlazada</strong> - Cada libro es un nodo conectado al siguiente</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-warning estructura-info" data-bs-toggle="modal" data-bs-target="#modalArbolCategorias" title="¿Cómo funciona el árbol de categorías?">
+                <i class="fas fa-sitemap"></i> Árbol de Categorías
+            </button>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12 text-end">
+            <a href="@Url.Action("AgregarLibro", "Library")" class="btn btn-success btn-action">
+                <i class="fas fa-plus"></i> Agregar Libro
+            </a>
+        </div>
+    </div>
+    
+    <!-- Formulario de búsqueda con gradientes -->
+    <div class="search-form">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="buscarTitulo" placeholder="Buscar por título..." value="@buscarTitulo" />
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" name="categoriaId">
+                    <option value="">Todas las categorías</option>
+                    @foreach (var categoria in categorias)
+                    {
+                        @if (categoria.Id.ToString() == categoriaSeleccionada)
+                        {
+                            <option value="@categoria.Id" selected>@categoria.Nombre</option>
+                        }
+                        else
+                        {
+                            <option value="@categoria.Id">@categoria.Nombre</option>
+                        }
+                        @if (categoria.Subcategorias != null)
+                        {
+                            foreach (var sub in categoria.Subcategorias)
+                            {
+                                @if (sub.Id.ToString() == categoriaSeleccionada)
+                                {
+                                    <option value="@sub.Id" selected>── @sub.Nombre</option>
+                                }
+                                else
+                                {
+                                    <option value="@sub.Id">── @sub.Nombre</option>
+                                }
+                                @if (sub.Subcategorias != null)
+                                {
+                                    foreach (var subsub in sub.Subcategorias)
+                                    {
+                                        @if (subsub.Id.ToString() == categoriaSeleccionada)
+                                        {
+                                            <option value="@subsub.Id" selected>──── @subsub.Nombre</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@subsub.Id">──── @subsub.Nombre</option>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 btn-action">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="@Url.Action("Catalogo", "Library")" class="btn btn-secondary w-100 btn-action">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card tabla-crud tabla-catalogo estructura-info">
+                <div class="card-header">
+                    <h5><i class="fas fa-table"></i> Catálogo de Libros (Lista Enlazada)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Título</th>
+                                    <th>Autor</th>
+                                    <th>Categoría</th>
+                                    <th>Año</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int i = 1;
+                                }
+                                @foreach (var libro in libros)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@libro.Titulo</td>
+                                        <td>@libro.Autor</td>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                @libro.Categoria?.NombreCompleto
+                                            </span>
+                                        </td>
+                                        <td>@libro.Anio</td>
+                                        <td>@libro.Stock</td>
+                                        <td>
+                                            @if (libro.Disponible)
+                                            {
+                                                <span class="badge bg-success">Disponible</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Prestado</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("EditarLibro", "Library", new { id = libro.Id })" class="btn btn-warning btn-sm me-1 btn-action">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </a>
+                                            <form method="post" action="@Url.Action("EliminarLibroPost", "Library", new { id = libro.Id })" style="display:inline">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este libro?')">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Lista Enlazada Detallada -->
+<div class="modal fade" id="modalListaEnlazadaDetallada" tabindex="-1" aria-labelledby="modalListaEnlazadaDetalladaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalListaEnlazadaDetalladaLabel">
+                    <i class="fas fa-link"></i> Lista Enlazada - Gestión del Catálogo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es una Lista Enlazada?</strong></h6>
+                        <p>Una lista enlazada es una estructura de datos donde cada elemento (nodo) contiene datos y una referencia al siguiente elemento.</p>
+                        
+                        <h6><strong>Características Principales:</strong></h6>
+                        <ul>
+                            <li><strong>Nodos conectados:</strong> Cada libro apunta al siguiente</li>
+                            <li><strong>Inserción eficiente:</strong> O(1) al inicio</li>
+                            <li><strong>Eliminación dinámica:</strong> Sin reorganizar toda la lista</li>
+                            <li><strong>Recorrido secuencial:</strong> Acceso elemento por elemento</li>
+                            <li><strong>Memoria dinámica:</strong> Solo usa el espacio necesario</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro Catálogo:</strong></h6>
+                        <p>Cada libro en el catálogo es un nodo de la lista enlazada:</p>
+                        <ul>
+                            <li><strong>Nodo:</strong> Libro con título, autor, categoría, etc.</li>
+                            <li><strong>Enlace:</strong> Referencia al siguiente libro</li>
+                            <li><strong>Operaciones:</strong> Agregar, eliminar, buscar, listar</li>
+                            <li><strong>Navegación:</strong> Recorrido secuencial</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas en el Sistema:</strong></h6>
+                        <ul>
+                            <li>Fácil agregar nuevos libros</li>
+                            <li>Eliminación sin afectar otros</li>
+                            <li>Búsqueda secuencial eficiente</li>
+                            <li>Memoria dinámica</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Proceso de Operaciones CRUD:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>CREATE</strong></h6>
+                                    <p class="small">1. Crear nuevo nodo<br>2. Asignar datos del libro<br>3. Conectar al inicio<br>4. Actualizar referencias</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>READ</strong></h6>
+                                    <p class="small">1. Recorrer nodos<br>2. Comparar datos<br>3. Mostrar información<br>4. Filtrar resultados</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>UPDATE</strong></h6>
+                                    <p class="small">1. Encontrar nodo<br>2. Modificar datos<br>3. Mantener enlaces<br>4. Validar cambios</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>DELETE</strong></h6>
+                                    <p class="small">1. Localizar nodo<br>2. Reconfigurar enlaces<br>3. Liberar memoria<br>4. Actualizar contadores</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><strong>Complejidad Temporal:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Mejor Caso</strong></h6>
+                                    <p class="small">Inserción: O(1)<br>Eliminación: O(1)<br>Búsqueda: O(1)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Caso Promedio</strong></h6>
+                                    <p class="small">Inserción: O(1)<br>Eliminación: O(n)<br>Búsqueda: O(n/2)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Peor Caso</strong></h6>
+                                    <p class="small">Inserción: O(1)<br>Eliminación: O(n)<br>Búsqueda: O(n)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("AgregarLibro", "Library")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Agregar Libro
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Árbol de Categorías -->
+<div class="modal fade" id="modalArbolCategorias" tabindex="-1" aria-labelledby="modalArbolCategoriasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalArbolCategoriasLabel">
+                    <i class="fas fa-sitemap"></i> Árbol Jerárquico - Categorías y Subcategorías
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es un Árbol?</strong></h6>
+                        <p>Un árbol es una estructura de datos jerárquica donde cada nodo puede tener múltiples hijos, pero solo un padre.</p>
+                        
+                        <h6><strong>Características del Árbol:</strong></h6>
+                        <ul>
+                            <li><strong>Jerarquía:</strong> Nodos padre e hijos</li>
+                            <li><strong>Raíz:</strong> Categorías principales</li>
+                            <li><strong>Hojas:</strong> Subcategorías finales</li>
+                            <li><strong>Niveles:</strong> Profundidad del árbol</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro Sistema:</strong></h6>
+                        <p>Las categorías forman un árbol jerárquico:</p>
+                        <ul>
+                            <li><strong>Raíz:</strong> Ficción, No Ficción, Académico</li>
+                            <li><strong>Hijos:</strong> Subcategorías específicas</li>
+                            <li><strong>Libros:</strong> Hojas del árbol</li>
+                            <li><strong>Navegación:</strong> Recorrido jerárquico</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas:</strong></h6>
+                        <ul>
+                            <li>Organización lógica</li>
+                            <li>Búsqueda eficiente</li>
+                            <li>Escalabilidad</li>
+                            <li>Navegación intuitiva</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><strong>Estructura Jerárquica:</strong></h6>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6><strong>Ficción</strong></h6>
+                                    <ul class="small">
+                                        <li>Novela</li>
+                                        <li>Ciencia Ficción</li>
+                                        <li>Misterio</li>
+                                        <li>Romance</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6><strong>No Ficción</strong></h6>
+                                    <ul class="small">
+                                        <li>Historia</li>
+                                        <li>Biografía</li>
+                                        <li>Ciencia</li>
+                                        <li>Filosofía</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6><strong>Académico</strong></h6>
+                                    <ul class="small">
+                                        <li>Matemáticas</li>
+                                        <li>Física</li>
+                                        <li>Química</li>
+                                        <li>Biología</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><strong>Operaciones del Árbol:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Agregar Categoría</strong></h6>
+                                    <p class="small">1. Crear nodo<br>2. Asignar padre<br>3. Actualizar enlaces</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Eliminar Categoría</strong></h6>
+                                    <p class="small">1. Verificar hijos<br>2. Reconfigurar<br>3. Liberar nodo</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Buscar en Árbol</strong></h6>
+                                    <p class="small">1. Recorrer niveles<br>2. Comparar datos<br>3. Retornar ruta</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("Categorias", "Library")" class="btn btn-success">
+                    <i class="fas fa-external-link-alt"></i> Ver Categorías
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 

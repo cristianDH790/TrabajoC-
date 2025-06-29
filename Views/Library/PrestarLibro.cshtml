@@ -1,0 +1,57 @@
+@model VisualizadorEstructuras.Models.Prestamo
+@{
+    ViewData["Title"] = "Prestar Libro";
+    var libros = ViewBag.Libros as List<VisualizadorEstructuras.Models.Libro> ?? new List<VisualizadorEstructuras.Models.Libro>();
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="@Url.Action("HistorialTransacciones", "Library")" class="btn btn-secondary">Volver a Préstamos</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-plus"></i> Prestar Libro</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="PrestarLibro" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="LibroId" class="form-label">Libro</label>
+                                    <select asp-for="LibroId" class="form-select">
+                                        <option value="">Seleccionar libro...</option>
+                                        @foreach (var libro in libros)
+                                        {
+                                            <option value="@libro.Id">@libro.Titulo - @libro.Autor (Stock: @libro.Stock)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="NombreUsuario" class="form-label">Nombre del Usuario</label>
+                                    <input asp-for="NombreUsuario" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Prestar Libro
+                                </button>
+                                <a href="@Url.Action("HistorialTransacciones", "Library")" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,137 @@
+@model VisualizadorEstructuras.Models.Categoria
+@{
+    ViewData["Title"] = "Agregar Categoría";
+    var categoriasPadre = ViewBag.CategoriasPadre as List<VisualizadorEstructuras.Models.Categoria> ?? new List<VisualizadorEstructuras.Models.Categoria>();
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="@Url.Action("Categorias", "Library")" class="btn btn-secondary">Volver a Categorías</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-plus"></i> Agregar Nueva Categoría</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AgregarCategoria" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nombre" class="form-label">Nombre</label>
+                                    <input asp-for="Nombre" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CategoriaPadreId" class="form-label">Categoría Padre (Opcional)</label>
+                                    <select asp-for="CategoriaPadreId" class="form-select">
+                                        <option value="">Sin categoría padre (Categoría raíz)</option>
+                                        @foreach (var categoria in categoriasPadre)
+                                        {
+                                            <option value="@categoria.Id">@categoria.Nombre</option>
+                                            @if (categoria.Subcategorias != null)
+                                            {
+                                                foreach (var sub in categoria.Subcategorias)
+                                                {
+                                                    <option value="@sub.Id">── @sub.Nombre</option>
+                                                    @if (sub.Subcategorias != null)
+                                                    {
+                                                        foreach (var subsub in sub.Subcategorias)
+                                                        {
+                                                            <option value="@subsub.Id">──── @subsub.Nombre</option>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        Deja vacío para crear una categoría principal, o selecciona una categoría existente para crear una subcategoría.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="Descripcion" class="form-label">Descripción</label>
+                                    <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Guardar Categoría
+                                </button>
+                                <a href="@Url.Action("Categorias", "Library")" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información sobre la estructura de árbol -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-info-circle"></i> Información sobre Estructura de Árbol</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>¿Qué es una categoría raíz?</strong></p>
+                    <p>Una categoría raíz es una categoría principal que no tiene categoría padre. Ejemplos:</p>
+                    <ul>
+                        <li><strong>Ficción</strong> - Categoría raíz</li>
+                        <li><strong>No Ficción</strong> - Categoría raíz</li>
+                        <li><strong>Académico</strong> - Categoría raíz</li>
+                    </ul>
+                    
+                    <p><strong>¿Qué es una subcategoría?</strong></p>
+                    <p>Una subcategoría es una categoría que pertenece a otra categoría. Ejemplos:</p>
+                    <ul>
+                        <li><strong>Novela</strong> - Subcategoría de Ficción</li>
+                        <li><strong>Ciencia Ficción</strong> - Subcategoría de Ficción</li>
+                        <li><strong>Historia</strong> - Subcategoría de No Ficción</li>
+                    </ul>
+                    
+                    <p><strong>Beneficios de la estructura jerárquica:</strong></p>
+                    <ul>
+                        <li>Mejor organización de libros</li>
+                        <li>Búsqueda más eficiente</li>
+                        <li>Navegación intuitiva</li>
+                        <li>Escalabilidad del sistema</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal explicativo del árbol -->
+<div class="modal fade" id="modalInfoArbol" tabindex="-1" aria-labelledby="modalInfoArbolLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalInfoArbolLabel"><i class="fas fa-info-circle"></i> ¿Por qué un Árbol?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616494.png" alt="Árbol" style="width:60px;" class="mb-2 d-block mx-auto" />
+                <p>Las categorías se gestionan como un <b>árbol</b>, donde cada nodo puede tener hijos (subcategorías). Esto permite una organización jerárquica y eficiente para navegar y agrupar libros.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div> 

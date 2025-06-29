@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe del Proyecto: Sistema de Gestión de Biblioteca</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+        }
+        .portada {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .portada h1 {
+            border: none;
+            color: white;
+        }
+        .portada p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .diagrama {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .estructura-info {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .codigo {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .funcionalidad {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .no-incluida {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .captura {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .conclusion {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="portada">
+            <h1>SISTEMA DE GESTIÓN DE BIBLIOTECA</h1>
+            <h2>Demostración de Estructuras de Datos</h2>
+            <p><strong>Integrantes del Equipo:</strong> [Tu nombre]</p>
+            <p><strong>Curso y Sección:</strong> Estructuras de Datos - [Sección]</p>
+            <p><strong>Docente:</strong> [Nombre del docente]</p>
+            <p><strong>Fecha de Entrega:</strong> [Fecha actual]</p>
+        </div>
+
+        <h2>1. ANÁLISIS DEL PROBLEMA</h2>
+        
+        <h3>Descripción del Problema Detectado</h3>
+        <p>La gestión tradicional de bibliotecas presenta múltiples desafíos que requieren soluciones eficientes:</p>
+        <ul>
+            <li><strong>Gestión manual de inventario:</strong> Dificultad para mantener un control actualizado de libros disponibles y prestados</li>
+            <li><strong>Procesamiento de reservas:</strong> Falta de un sistema ordenado para manejar solicitudes de libros</li>
+            <li><strong>Organización de categorías:</strong> Ausencia de una estructura jerárquica para clasificar el material bibliográfico</li>
+            <li><strong>Seguimiento de transacciones:</strong> Imposibilidad de mantener un historial ordenado de préstamos y devoluciones</li>
+            <li><strong>Búsqueda ineficiente:</strong> Tiempo excesivo para localizar libros específicos en el catálogo</li>
+        </ul>
+
+        <h3>Diagrama de Ishikawa (Causa-Efecto)</h3>
+        <div class="diagrama">
+                    GESTIÓN INEFICIENTE DE BIBLIOTECA
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+    MÉTODOS              MATERIALES            PERSONAL
+        │                     │                     │
+    ┌───┴───┐           ┌───┴───┐           ┌───┴───┐
+    │       │           │       │           │       │
+• Gestión   │         • Falta   │         • Personal│
+  manual    │           de      │           limitado │
+• Sin       │           sistema │         • Falta de │
+  software  │           digital │           capacitación│
+• Procesos  │         • Recursos│         • Sobrecarga│
+  lentos    │           limitados│           de trabajo│
+    │           │           │
+    └───────────┘           └───────────┘           └───────────┘
+        │                     │                     │
+    AMBIENTE              MEDICIÓN              MÁQUINAS
+        │                     │                     │
+    ┌───┴───┐           ┌───┴───┐           ┌───┴───┐
+    │       │           │       │           │       │
+• Espacio   │         • Sin     │         • Sin     │
+  limitado  │           métricas│           equipos  │
+• Falta de  │           de      │           informáticos│
+  organización│           rendimiento│         • Infraestructura│
+• Condiciones│         • Sin     │           obsoleta│
+  inadecuadas│           control │         • Falta de │
+    │           de calidad│           automatización│
+    └───────────┘           └───────────┘           └───────────┘
+        </div>
+
+        <h2>2. OBJETIVOS</h2>
+        
+        <h3>Objetivo General</h3>
+        <p>Desarrollar un sistema de gestión de biblioteca que demuestre la implementación práctica de estructuras de datos fundamentales (listas enlazadas, pilas, colas y árboles) para resolver problemas reales de organización y gestión de información bibliográfica.</p>
+
+        <h3>Objetivos Específicos</h3>
+        <ol>
+            <li><strong>Implementar estructuras de datos personalizadas</strong> para gestionar libros (lista enlazada), transacciones (pila), reservas (cola) y categorías (árbol).</li>
+            <li><strong>Desarrollar una interfaz web intuitiva</strong> que permita visualizar y operar sobre las estructuras de datos implementadas, facilitando la comprensión de su funcionamiento.</li>
+            <li><strong>Demostrar la eficiencia operativa</strong> de cada estructura de datos en su contexto específico, evidenciando las ventajas de su implementación sobre métodos tradicionales.</li>
+            <li><strong>Crear un sistema funcional</strong> que permita realizar operaciones CRUD completas sobre libros, categorías, transacciones y reservas, validando la utilidad práctica de las estructuras implementadas.</li>
+        </ol>
+
+        <h2>3. ALCANCE DE LA SOLUCIÓN</h2>
+        
+        <h3>Funcionalidades Incluidas</h3>
+        <div class="funcionalidad">✅ <strong>Gestión de Libros</strong>
+        - Agregar, editar, eliminar y listar libros
+        - Control de stock y disponibilidad
+        - Búsqueda por título, autor o categoría
+        - Visualización de libros recientes</div>
+
+        <div class="funcionalidad">✅ <strong>Gestión de Categorías</strong>
+        - Crear jerarquía de categorías y subcategorías
+        - Organización en estructura de árbol
+        - Visualización de niveles y relaciones padre-hijo</div>
+
+        <div class="funcionalidad">✅ <strong>Gestión de Transacciones</strong>
+        - Registro de préstamos y devoluciones
+        - Historial ordenado por fecha (LIFO)
+        - Control de estado de libros</div>
+
+        <div class="funcionalidad">✅ <strong>Gestión de Reservas</strong>
+        - Crear y gestionar reservas de libros
+        - Procesamiento en orden FIFO
+        - Control de reservas pendientes</div>
+
+        <div class="funcionalidad">✅ <strong>Dashboard Interactivo</strong>
+        - Estadísticas en tiempo real
+        - Modales explicativos de estructuras
+        - Visualización de datos con gráficos</div>
+
+        <h3>Funcionalidades No Incluidas</h3>
+        <div class="no-incluida">❌ <strong>Gestión de Usuarios</strong>
+        - Sistema de autenticación y autorización
+        - Perfiles de usuario y roles
+        - Historial personal de préstamos</div>
+
+        <div class="no-incluida">❌ <strong>Reportes Avanzados</strong>
+        - Generación de reportes PDF
+        - Estadísticas detalladas por período
+        - Análisis de tendencias</div>
+
+        <h2>4. ESTRUCTURAS DE DATOS UTILIZADAS</h2>
+
+        <div class="estructura-info">
+            <h3>4.1 Listas Enlazadas</h3>
+            <p><strong>Implementación:</strong> <code>Models/LinkedList.cs</code></p>
+            <div class="codigo">
+public class LinkedList&lt;T&gt;
+{
+    private LinkedListNode&lt;T&gt;? _head;
+    private int _count;
+    
+    public void AddLast(T data) { /* Agregar al final */ }
+    public T? Find(Func&lt;T, bool&gt; predicate) { /* Búsqueda */ }
+    public bool Remove(Func&lt;T, bool&gt; predicate) { /* Eliminación */ }
+}
+            </div>
+            <p><strong>Aplicación en el Sistema:</strong></p>
+            <ul>
+                <li><strong>Gestión de Libros:</strong> Almacenamiento secuencial de libros en el catálogo</li>
+                <li><strong>Operaciones:</strong> Agregar nuevos libros, buscar por criterios, eliminar libros</li>
+                <li><strong>Ventajas:</strong> Inserción eficiente O(1) al final, eliminación dinámica sin reorganización</li>
+            </ul>
+        </div>
+
+        <div class="estructura-info">
+            <h3>4.2 Pilas (Stack)</h3>
+            <p><strong>Implementación:</strong> <code>Models/Stack.cs</code></p>
+            <div class="codigo">
+public class Stack&lt;T&gt;
+{
+    private LinkedListNode&lt;T&gt;? _top;
+    
+    public void Push(T data) { /* Agregar al tope */ }
+    public T Pop() { /* Remover del tope */ }
+    public T Peek() { /* Ver tope sin remover */ }
+}
+            </div>
+            <p><strong>Aplicación en el Sistema:</strong></p>
+            <ul>
+                <li><strong>Historial de Transacciones:</strong> Último préstamo/devolución es el primero en mostrarse</li>
+                <li><strong>Operaciones:</strong> Push (nuevo préstamo), Pop (devolución), Peek (ver transacción actual)</li>
+                <li><strong>Ventajas:</strong> Control LIFO natural para historial, fácil deshacer operaciones</li>
+            </ul>
+        </div>
+
+        <div class="estructura-info">
+            <h3>4.3 Colas (Queue)</h3>
+            <p><strong>Implementación:</strong> <code>Models/Queue.cs</code></p>
+            <div class="codigo">
+public class Queue&lt;T&gt;
+{
+    private LinkedListNode&lt;T&gt;? _front;
+    private LinkedListNode&lt;T&gt;? _rear;
+    
+    public void Enqueue(T data) { /* Agregar al final */ }
+    public T Dequeue() { /* Remover del frente */ }
+    public T Peek() { /* Ver frente sin remover */ }
+}
+            </div>
+            <p><strong>Aplicación en el Sistema:</strong></p>
+            <ul>
+                <li><strong>Gestión de Reservas:</strong> Primera reserva es la primera en ser atendida</li>
+                <li><strong>Operaciones:</strong> Enqueue (nueva reserva), Dequeue (procesar reserva), Peek (ver siguiente)</li>
+                <li><strong>Ventajas:</strong> Orden justo FIFO, gestión de prioridades natural</li>
+            </ul>
+        </div>
+
+        <div class="estructura-info">
+            <h3>4.4 Árboles (Tree)</h3>
+            <p><strong>Implementación:</strong> <code>Models/Tree.cs</code></p>
+            <div class="codigo">
+public class Tree&lt;T&gt;
+{
+    public TreeNode&lt;T&gt;? Root { get; private set; }
+    
+    public void AddChild(T data) { /* Agregar hijo */ }
+    public TreeNode&lt;T&gt;? FindNode(Func&lt;T, bool&gt; predicate) { /* Búsqueda */ }
+    public List&lt;T&gt; DepthFirstTraversal() { /* Recorrido DFS */ }
+    public List&lt;T&gt; BreadthFirstTraversal() { /* Recorrido BFS */ }
+}
+            </div>
+            <p><strong>Aplicación en el Sistema:</strong></p>
+            <ul>
+                <li><strong>Organización de Categorías:</strong> Jerarquía de categorías principales y subcategorías</li>
+                <li><strong>Operaciones:</strong> Agregar categorías, buscar en árbol, recorridos DFS/BFS</li>
+                <li><strong>Ventajas:</strong> Organización jerárquica natural, búsqueda eficiente, escalabilidad</li>
+            </ul>
+        </div>
+
+        <h2>5. HERRAMIENTAS UTILIZADAS</h2>
+        
+        <h3>Lenguaje de Programación</h3>
+        <ul>
+            <li><strong>C# 12.0:</strong> Lenguaje principal del proyecto</li>
+            <li><strong>HTML/CSS/JavaScript:</strong> Frontend y interactividad</li>
+            <li><strong>SQL:</strong> Consultas de base de datos</li>
+        </ul>
+
+        <h3>Librerías y Frameworks</h3>
+        <ul>
+            <li><strong>ASP.NET Core 9.0:</strong> Framework web</li>
+            <li><strong>Entity Framework Core 9.0.6:</strong> ORM para base de datos</li>
+            <li><strong>Bootstrap 5:</strong> Framework CSS para interfaz</li>
+            <li><strong>Font Awesome:</strong> Iconografía</li>
+            <li><strong>SQLite:</strong> Base de datos embebida</li>
+        </ul>
+
+        <h2>6. PRODUCTO SOFTWARE</h2>
+
+        <h3>Descripción General del Programa</h3>
+        <p>El <strong>Sistema de Gestión de Biblioteca</strong> es una aplicación web desarrollada en ASP.NET Core MVC que demuestra la implementación práctica de cuatro estructuras de datos fundamentales:</p>
+        <ul>
+            <li><strong>Lista Enlazada:</strong> Para gestión del catálogo de libros</li>
+            <li><strong>Pila:</strong> Para historial de transacciones (LIFO)</li>
+            <li><strong>Cola:</strong> Para gestión de reservas (FIFO)</li>
+            <li><strong>Árbol:</strong> Para organización jerárquica de categorías</li>
+        </ul>
+
+        <h3>Capturas de Pantalla del Sistema Funcionando</h3>
+        
+        <h4>Dashboard Principal</h4>
+        <div class="captura">
+┌─────────────────────────────────────────────────────────────┐
+│                SISTEMA DE GESTIÓN DE BIBLIOTECA             │
+│           Demostración de Estructuras de Datos              │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+│  │  150    │ │   89    │ │   61    │ │  234    │ │   12    │ │
+│  │ Libros  │ │Dispon.  │ │Prest.   │ │Transac. │ │Reservas │ │
+│  │[Lista]  │ │[Lista]  │ │[Lista]  │ │ [Pila]  │ │ [Cola]  │ │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │
+│                                                             │
+│  ┌─────────┐                                                │
+│  │   8     │                                                │
+│  │Categorías│                                               │
+│  │ [Árbol] │                                                │
+│  └─────────┘                                                │
+└─────────────────────────────────────────────────────────────┘
+        </div>
+
+        <h4>Vista de Categorías (Estructura de Árbol)</h4>
+        <div class="captura">
+┌─────────────────────────────────────────────────────────────┐
+│                    CATEGORÍAS                               │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ 📁 Literatura                                           │ │
+│  │   └── 📁 Novela                                         │ │
+│  │       └── 📁 Novela Romántica                           │ │
+│  │       └── 📁 Novela de Aventuras                        │ │
+│  │   └── 📁 Poesía                                         │ │
+│  │                                                         │ │
+│  │ 📁 Ciencias                                             │ │
+│  │   └── 📁 Matemáticas                                    │ │
+│  │   └── 📁 Física                                         │ │
+│  │       └── 📁 Mecánica Cuántica                          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+        </div>
+
+        <h2>7. CONCLUSIONES</h2>
+
+        <div class="conclusion">
+            <h3>Aprendizaje Alcanzado por el Equipo</h3>
+            <ol>
+                <li><strong>Comprensión Profunda de Estructuras:</strong> La implementación práctica permitió comprender no solo la teoría, sino también las ventajas y limitaciones de cada estructura en contextos reales.</li>
+                <li><strong>Desarrollo de Software Completo:</strong> Se adquirió experiencia en el desarrollo de aplicaciones web completas, desde la base de datos hasta la interfaz de usuario.</li>
+                <li><strong>Integración de Tecnologías:</strong> Se aprendió a integrar múltiples tecnologías (C#, ASP.NET, Entity Framework, Bootstrap) en un proyecto cohesivo.</li>
+                <li><strong>Resolución de Problemas:</strong> Se desarrolló la capacidad de identificar qué estructura de datos es más apropiada para cada tipo de problema.</li>
+            </ol>
+        </div>
+
+        <h3>Reflexión sobre la Utilidad de las Estructuras</h3>
+        <ul>
+            <li><strong>Listas Enlazadas:</strong> Demostraron ser ideales para catálogos dinámicos donde el tamaño no es predecible y se requieren inserciones/eliminaciones frecuentes.</li>
+            <li><strong>Pilas:</strong> Probaron su utilidad en el manejo de historiales y operaciones que requieren deshacer, siendo intuitivas para el usuario final.</li>
+            <li><strong>Colas:</strong> Mostraron su eficacia en la gestión de procesos que requieren orden justo, como las reservas de libros.</li>
+            <li><strong>Árboles:</strong> Evidenciaron su poder para organizar información jerárquica de manera natural y escalable.</li>
+        </ul>
+
+        <h2>8. ANEXOS</h2>
+
+        <h3>Anexo A: Fragmentos de Código Destacados</h3>
+        
+        <h4>Implementación de Nodo de Lista Enlazada</h4>
+        <div class="codigo">
+public class LinkedListNode&lt;T&gt;
+{
+    public T Data { get; set; }
+    public LinkedListNode&lt;T&gt;? Next { get; set; }
+    
+    public LinkedListNode(T data)
+    {
+        Data = data;
+        Next = null;
+    }
+}
+        </div>
+
+        <h4>Método de Búsqueda en Árbol</h4>
+        <div class="codigo">
+private TreeNode&lt;T&gt;? FindNodeRecursive(TreeNode&lt;T&gt; node, Func&lt;T, bool&gt; predicate)
+{
+    if (predicate(node.Data))
+        return node;
+
+    foreach (var child in node.Children)
+    {
+        var result = FindNodeRecursive(child, predicate);
+        if (result != null)
+            return result;
+    }
+    return null;
+}
+        </div>
+
+        <h3>Anexo B: Manual de Usuario Básico</h3>
+        
+        <h4>Acceso al Sistema</h4>
+        <ol>
+            <li>Abrir navegador web</li>
+            <li>Navegar a <code>http://localhost:5011</code></li>
+            <li>Hacer clic en "Library" en el menú principal</li>
+        </ol>
+
+        <h4>Gestión de Libros</h4>
+        <ol>
+            <li>Ir a "Catálogo" para ver todos los libros</li>
+            <li>Hacer clic en "Agregar Libro" para crear nuevo</li>
+            <li>Completar formulario y guardar</li>
+            <li>Usar botones "Editar" o "Eliminar" según necesidad</li>
+        </ol>
+
+        <h4>Visualización de Estructuras</h4>
+        <ol>
+            <li>En el dashboard, hacer clic en cualquier card</li>
+            <li>Leer explicación de la estructura en el modal</li>
+            <li>Navegar a la vista correspondiente para ver implementación</li>
+        </ol>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #3498db;">
+        <p style="text-align: center; color: #7f8c8d; font-style: italic;">Fin del Informe</p>
+    </div>
+</body>
+</html> 

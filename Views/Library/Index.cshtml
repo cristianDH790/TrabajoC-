@@ -1,0 +1,623 @@
+@{
+    ViewData["Title"] = "Sistema de Gestión de Biblioteca";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var librosRecientes = (ViewBag.Libros as List<VisualizadorEstructuras.Models.Libro>)?.OrderByDescending(l => l.Id).Take(10).ToList() ?? new List<VisualizadorEstructuras.Models.Libro>();
+}
+
+<style>
+    .dashboard-cards .card {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s ease;
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+    .dashboard-cards .card:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Colores específicos para cada card */
+    .card-libros { background: #007bff; }
+    .card-disponibles { background: #28a745; }
+    .card-prestados { background: #ffc107; }
+    .card-transacciones { background: #17a2b8; }
+    .card-reservas { background: #6f42c1; }
+    .card-categorias { background: #fd7e14; }
+    
+    .dashboard-cards .card-body {
+        padding: 1.5rem;
+        text-align: center;
+        color: white;
+    }
+    .dashboard-cards .card h4 {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .dashboard-cards .card small {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .dashboard-cards .card .text-muted {
+        color: rgba(255,255,255,0.8) !important;
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    
+    .tabla-libros {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    .tabla-libros .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1rem 1.5rem;
+    }
+    .tabla-libros .card-header h3 {
+        color: #495057;
+        font-weight: 600;
+        margin: 0;
+    }
+    .tabla-libros .card-header .btn {
+        background: #6c757d;
+        border: 1px solid #6c757d;
+        color: white;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .tabla-libros .card-header .btn:hover {
+        background: #5a6268;
+        border-color: #545b62;
+    }
+    .tabla-libros .table {
+        margin: 0;
+        background: white;
+    }
+    .tabla-libros th {
+        background: #e9ecef;
+        color: #495057;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+    .tabla-libros td {
+        vertical-align: middle;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f8f9fa;
+        color: #495057;
+    }
+    .tabla-libros tr:hover {
+        background: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+    .tabla-libros .badge {
+        font-weight: 500;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+    }
+    .badge.bg-success {
+        background: #28a745 !important;
+        color: white;
+    }
+    .badge.bg-danger {
+        background: #dc3545 !important;
+        color: white;
+    }
+    .badge.bg-secondary {
+        background: #6c757d !important;
+        color: white;
+    }
+    
+    .estructura-info {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .estructura-info:hover {
+        transform: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .main-title {
+        color: #495057;
+        font-weight: 600;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .subtitle {
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center main-title">
+                <i class="fas fa-book-open"></i> Sistema de Gestión de Biblioteca
+            </h1>
+            <p class="text-center subtitle">
+                Demostración de estructuras de datos: <strong>Listas Enlazadas</strong>, <strong>Pilas</strong>, <strong>Colas</strong> y <strong>Árboles</strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- Estadísticas Dashboard -->
+    <div class="row dashboard-cards justify-content-center mb-4 mt-4">
+        <div class="col-md-2">
+            <div class="card card-libros estructura-info" data-bs-toggle="modal" data-bs-target="#modalListaEnlazada">
+                <div class="card-body">
+                    <h4>@(ViewBag.Estadisticas != null ? ViewBag.Estadisticas["TotalLibros"] : 0)</h4>
+                    <small>Total Libros</small>
+                    <br><small class="text-muted"><i class="fas fa-info-circle"></i> Lista Enlazada</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card card-disponibles estructura-info" data-bs-toggle="modal" data-bs-target="#modalListaEnlazada">
+                <div class="card-body">
+                    <h4>@(ViewBag.Estadisticas != null ? ViewBag.Estadisticas["LibrosDisponibles"] : 0)</h4>
+                    <small>Disponibles</small>
+                    <br><small class="text-muted"><i class="fas fa-info-circle"></i> Lista Enlazada</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card card-prestados estructura-info" data-bs-toggle="modal" data-bs-target="#modalListaEnlazada">
+                <div class="card-body">
+                    <h4>@(ViewBag.Estadisticas != null ? ViewBag.Estadisticas["LibrosPrestados"] : 0)</h4>
+                    <small>Prestados</small>
+                    <br><small class="text-muted"><i class="fas fa-info-circle"></i> Lista Enlazada</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card card-transacciones estructura-info" data-bs-toggle="modal" data-bs-target="#modalPila">
+                <div class="card-body">
+                    <h4>@(ViewBag.Estadisticas != null ? ViewBag.Estadisticas["TotalTransacciones"] : 0)</h4>
+                    <small>Transacciones</small>
+                    <br><small class="text-muted"><i class="fas fa-info-circle"></i> Pila (LIFO)</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card card-reservas estructura-info" data-bs-toggle="modal" data-bs-target="#modalCola">
+                <div class="card-body">
+                    <h4>@(ViewBag.Estadisticas != null ? ViewBag.Estadisticas["ReservasPendientes"] : 0)</h4>
+                    <small>Reservas</small>
+                    <br><small class="text-muted"><i class="fas fa-info-circle"></i> Cola (FIFO)</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card card-categorias estructura-info" data-bs-toggle="modal" data-bs-target="#modalArbol">
+                <div class="card-body">
+                    <h4>@(ViewBag.Estadisticas != null ? ViewBag.Estadisticas["Categorias"] : 0)</h4>
+                    <small>Categorías</small>
+                    <br><small class="text-muted"><i class="fas fa-info-circle"></i> Árbol</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libros recientes -->
+    <div class="tabla-libros">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-clock"></i> Libros agregados recientemente
+                <button class="btn btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#modalListaEnlazada" title="¿Cómo funciona la lista enlazada?">
+                    <i class="fas fa-info-circle"></i> Explicación
+                </button>
+            </h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Categoría</th>
+                        <th>Año</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                    }
+                    @foreach (var libro in librosRecientes)
+                    {
+                        <tr>
+                            <td><strong>@i</strong></td>
+                            <td><strong>@libro.Titulo</strong></td>
+                            <td>@libro.Autor</td>
+                            <td><span class="badge bg-secondary">@libro.Categoria?.NombreCompleto</span></td>
+                            <td>@libro.Anio</td>
+                            <td><strong>@libro.Stock</strong></td>
+                            <td>
+                                @if (libro.Disponible)
+                                {
+                                    <span class="badge bg-success">Disponible</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Prestado</span>
+                                }
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Lista Enlazada -->
+<div class="modal fade" id="modalListaEnlazada" tabindex="-1" aria-labelledby="modalListaEnlazadaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalListaEnlazadaLabel">
+                    <i class="fas fa-link"></i> Lista Enlazada - Gestión de Libros
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es una Lista Enlazada?</strong></h6>
+                        <p>Una lista enlazada es una estructura de datos donde cada elemento (nodo) contiene datos y una referencia al siguiente elemento.</p>
+                        
+                        <h6><strong>Características:</strong></h6>
+                        <ul>
+                            <li><strong>Nodos conectados:</strong> Cada libro apunta al siguiente</li>
+                            <li><strong>Inserción eficiente:</strong> O(1) al inicio</li>
+                            <li><strong>Eliminación dinámica:</strong> Sin reorganizar toda la lista</li>
+                            <li><strong>Recorrido secuencial:</strong> Acceso elemento por elemento</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro sistema:</strong></h6>
+                        <p>Los libros se almacenan como una lista enlazada donde:</p>
+                        <ul>
+                            <li><strong>Nodo:</strong> Cada libro con sus datos</li>
+                            <li><strong>Enlace:</strong> Referencia al siguiente libro</li>
+                            <li><strong>Operaciones:</strong> Agregar, eliminar, buscar, listar</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas:</strong></h6>
+                        <ul>
+                            <li>Fácil agregar nuevos libros</li>
+                            <li>Eliminación sin afectar otros</li>
+                            <li>Búsqueda secuencial eficiente</li>
+                            <li>Memoria dinámica</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><strong>Proceso de Operaciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Agregar Libro</strong></h6>
+                                    <p class="small">1. Crear nuevo nodo<br>2. Conectar al inicio<br>3. Actualizar referencias</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Eliminar Libro</strong></h6>
+                                    <p class="small">1. Encontrar nodo<br>2. Reconfigurar enlaces<br>3. Liberar memoria</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6><strong>Buscar Libro</strong></h6>
+                                    <p class="small">1. Recorrer nodos<br>2. Comparar datos<br>3. Retornar resultado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("Catalogo", "Library")" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt"></i> Ver Catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pila -->
+<div class="modal fade" id="modalPila" tabindex="-1" aria-labelledby="modalPilaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalPilaLabel">
+                    <i class="fas fa-layer-group"></i> Pila (Stack) - Historial de Transacciones
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es una Pila?</strong></h6>
+                        <p>Una pila es una estructura de datos LIFO (Last In, First Out) donde el último elemento agregado es el primero en salir.</p>
+                        
+                        <h6><strong>Características:</strong></h6>
+                        <ul>
+                            <li><strong>LIFO:</strong> Last In, First Out</li>
+                            <li><strong>Operaciones:</strong> Push (agregar), Pop (quitar), Peek (ver)</li>
+                            <li><strong>Acceso limitado:</strong> Solo al elemento superior</li>
+                            <li><strong>Implementación:</strong> Array o Lista Enlazada</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro sistema:</strong></h6>
+                        <p>El historial de préstamos funciona como una pila donde:</p>
+                        <ul>
+                            <li><strong>Push:</strong> Nuevo préstamo se agrega al tope</li>
+                            <li><strong>Pop:</strong> Devolución quita el préstamo más reciente</li>
+                            <li><strong>Peek:</strong> Ver el préstamo actual</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas:</strong></h6>
+                        <ul>
+                            <li>Control de transacciones recientes</li>
+                            <li>Deshacer operaciones fácilmente</li>
+                            <li>Historial ordenado cronológicamente</li>
+                            <li>Gestión de estados</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><strong>Proceso de Operaciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Prestar Libro (Push)</strong></h6>
+                                    <p class="small">1. Crear transacción<br>2. Agregar al tope<br>3. Actualizar estado</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Devolver Libro (Pop)</strong></h6>
+                                    <p class="small">1. Tomar del tope<br>2. Marcar como devuelto<br>3. Actualizar libro</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Ver Historial (Peek)</strong></h6>
+                                    <p class="small">1. Recorrer pila<br>2. Mostrar transacciones<br>3. Ordenar por fecha</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("HistorialTransacciones", "Library")" class="btn btn-warning">
+                    <i class="fas fa-external-link-alt"></i> Ver Préstamos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cola -->
+<div class="modal fade" id="modalCola" tabindex="-1" aria-labelledby="modalColaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalColaLabel">
+                    <i class="fas fa-clock"></i> Cola (Queue) - Gestión de Reservas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es una Cola?</strong></h6>
+                        <p>Una cola es una estructura de datos FIFO (First In, First Out) donde el primer elemento agregado es el primero en salir.</p>
+                        
+                        <h6><strong>Características:</strong></h6>
+                        <ul>
+                            <li><strong>FIFO:</strong> First In, First Out</li>
+                            <li><strong>Operaciones:</strong> Enqueue (agregar), Dequeue (quitar), Peek (ver)</li>
+                            <li><strong>Acceso:</strong> Solo al frente y final</li>
+                            <li><strong>Implementación:</strong> Array o Lista Enlazada</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro sistema:</strong></h6>
+                        <p>Las reservas funcionan como una cola donde:</p>
+                        <ul>
+                            <li><strong>Enqueue:</strong> Nueva reserva va al final</li>
+                            <li><strong>Dequeue:</strong> Primera reserva se procesa</li>
+                            <li><strong>Peek:</strong> Ver siguiente reserva</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas:</strong></h6>
+                        <ul>
+                            <li>Orden justo de atención</li>
+                            <li>Gestión de prioridades</li>
+                            <li>Control de espera</li>
+                            <li>Procesamiento secuencial</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><strong>Proceso de Operaciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Crear Reserva (Enqueue)</strong></h6>
+                                    <p class="small">1. Crear solicitud<br>2. Agregar al final<br>3. Asignar prioridad</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Procesar Reserva (Dequeue)</strong></h6>
+                                    <p class="small">1. Tomar del frente<br>2. Procesar solicitud<br>3. Actualizar estado</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Ver Cola (Peek)</strong></h6>
+                                    <p class="small">1. Mostrar orden<br>2. Listar esperas<br>3. Calcular tiempos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("Reservas", "Library")" class="btn btn-info">
+                    <i class="fas fa-external-link-alt"></i> Ver Reservas
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Árbol -->
+<div class="modal fade" id="modalArbol" tabindex="-1" aria-labelledby="modalArbolLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalArbolLabel">
+                    <i class="fas fa-sitemap"></i> Árbol (Tree) - Gestión de Categorías
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><strong>¿Qué es un Árbol?</strong></h6>
+                        <p>Un árbol es una estructura de datos jerárquica donde cada nodo puede tener múltiples hijos, pero solo un padre.</p>
+                        
+                        <h6><strong>Características:</strong></h6>
+                        <ul>
+                            <li><strong>Jerarquía:</strong> Nodos padre e hijos</li>
+                            <li><strong>Raíz:</strong> Nodo sin padre</li>
+                            <li><strong>Hojas:</strong> Nodos sin hijos</li>
+                            <li><strong>Niveles:</strong> Profundidad del árbol</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><strong>En nuestro sistema:</strong></h6>
+                        <p>Las categorías forman un árbol donde:</p>
+                        <ul>
+                            <li><strong>Raíz:</strong> Categorías principales</li>
+                            <li><strong>Hijos:</strong> Subcategorías</li>
+                            <li><strong>Hojas:</strong> Categorías sin subcategorías</li>
+                            <li><strong>Navegación:</strong> Recorrido jerárquico</li>
+                        </ul>
+                        
+                        <h6><strong>Ventajas:</strong></h6>
+                        <ul>
+                            <li>Organización jerárquica</li>
+                            <li>Búsqueda eficiente</li>
+                            <li>Escalabilidad</li>
+                            <li>Navegación intuitiva</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6><strong>Proceso de Operaciones:</strong></h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Agregar Categoría</strong></h6>
+                                    <p class="small">1. Crear nodo<br>2. Asignar padre<br>3. Actualizar enlaces</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6><strong>Eliminar Categoría</strong></h6>
+                                    <p class="small">1. Verificar hijos<br>2. Reconfigurar<br>3. Liberar nodo</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6><strong>Buscar en Árbol</strong></h6>
+                                    <p class="small">1. Recorrer niveles<br>2. Comparar datos<br>3. Retornar ruta</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="@Url.Action("Categorias", "Library")" class="btn btn-success">
+                    <i class="fas fa-external-link-alt"></i> Ver Categorías
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Actualizar estadísticas en tiempo real
+        function actualizarEstadisticas() {
+            fetch('/Library/ObtenerEstadisticas')
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar contadores
+                    document.querySelectorAll('.card h4').forEach((el, index) => {
+                        const valores = [data.TotalLibros, data.LibrosDisponibles, data.LibrosPrestados, 
+                                      data.TotalTransacciones, data.ReservasPendientes, data.Categorias];
+                        if (valores[index] !== undefined) {
+                            el.textContent = valores[index];
+                        }
+                    });
+                });
+        }
+
+        // Actualizar cada 5 segundos
+        setInterval(actualizarEstadisticas, 5000);
+    </script>
+} 
